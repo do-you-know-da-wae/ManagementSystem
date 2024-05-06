@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Management System</string>
+    <string name="rules">Rules Modification</string>
+    <string name="workModify">Work Modification</string>
+    <string name="workAssign">Work Assign</string>
+    <string name="editWorkingTime">Edit working time</string>
+    <string name="showRules">Show Rules</string>
+    <string name="whatTimeStart">"Start Time: "</string>
+    <string name="whatStartMinute">"Change Start minute to "</string>
+</resources>
