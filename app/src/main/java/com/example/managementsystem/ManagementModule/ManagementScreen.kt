@@ -1,4 +1,4 @@
-package com.example.managementsystem
+package com.example.managementsystem.ManagementModule
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,18 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.managementsystem.Screen.MainScreen
-import com.example.managementsystem.Screen.RulesModifyScreen
-import com.example.managementsystem.Screen.addWorkScreen
-import com.example.managementsystem.Screen.modifyWorkScreen
+import com.example.managementsystem.R
 import com.example.managementsystem.ui.theme.ManagementSystemTheme
 
 enum class ManagementScreen(@StringRes val title: Int) {
@@ -103,7 +98,7 @@ fun ManagementApp(
                 MainScreen()
             }
             composable(route = ManagementScreen.ruleSet.name) {
-                RulesModifyScreen()
+                ShowRulesScreen()
             }
             composable(route = ManagementScreen.workAssign.name) {
                 addWorkScreen()

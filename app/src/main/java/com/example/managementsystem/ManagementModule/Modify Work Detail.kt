@@ -1,4 +1,4 @@
-package com.example.managementsystem.Screen
+package com.example.managementsystem.ManagementModule
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,12 +7,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun addWorkScreen(
+fun modifyWorkScreen(
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+    ) {
         Row {
-            Text("This is add work screen")
+            Text("This is work modification screen")
+        }
+        Row {
+            Text("You can modify the work detail here")
         }
     }
 }

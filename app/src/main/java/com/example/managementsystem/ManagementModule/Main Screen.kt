@@ -1,4 +1,4 @@
-package com.example.managementsystem.Screen
+package com.example.managementsystem.ManagementModule
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
