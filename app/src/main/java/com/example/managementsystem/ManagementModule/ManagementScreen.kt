@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.BottomAppBar
@@ -14,6 +13,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,21 +25,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.managementsystem.Data.WorkListData
 import com.example.managementsystem.R
 import com.example.managementsystem.ui.theme.ManagementSystemTheme
 
 enum class ManagementScreen(@StringRes val title: Int) {
     managementMain(title = R.string.app_name),
     ruleSet(title = R.string.rules),
-    workModify(title = R.string.workModify),
-    workAssign(title = R.string.workAssign)
+    displayWork(title = R.string.displayWorkList),
+    workAssign(title = R.string.workAssign),
+    detailedWork(title = R.string.workDetail)
 }
 
 @Composable
 fun naviagtionBar(
     goSetRulesButtonClicked: () -> Unit = {},
-    goAddWorkButtonClicked: () -> Unit = {},
-    goModifyWorkButtonClicked: () -> Unit = {},
+    goShowWorkButtonClicked: () -> Unit = {},
     currentScreen: ManagementScreen,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
@@ -52,16 +56,10 @@ fun naviagtionBar(
                     contentDescription = "Rule Set"
                 )
             }
-            IconButton(onClick = goAddWorkButtonClicked) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = "Add Work"
-                )
-            }
-            IconButton(onClick = goModifyWorkButtonClicked) {
+            IconButton(onClick = goShowWorkButtonClicked) {
                 Icon(
                     Icons.Filled.Edit,
-                    contentDescription = "Edit Work"
+                    contentDescription = "Add Work"
                 )
             }
         }
@@ -78,14 +76,20 @@ fun ManagementApp(
         backStackEntry?.destination?.route ?: ManagementScreen.managementMain.name
     )
 
+    val workList = remember { mutableStateListOf(*WorkListData.workList.toTypedArray()) }
+    var selectedWork by remember { mutableStateOf<WorkListData.Work?>(null) }
+
+    val onDeleteWork: (WorkListData.Work) -> Unit = { work ->
+        workList.remove(work)
+    }
+
     Scaffold(
         bottomBar = {
             naviagtionBar(
                 currentScreen = currentScreen,
                 navigateUp = { navController.navigateUp() },
                 goSetRulesButtonClicked = {navController.navigate(ManagementScreen.ruleSet.name)},
-                goAddWorkButtonClicked = {navController.navigate(ManagementScreen.workAssign.name)},
-                goModifyWorkButtonClicked = {navController.navigate(ManagementScreen.workModify.name)}
+                goShowWorkButtonClicked = {navController.navigate(ManagementScreen.displayWork.name)}
             )
         }
     ) { innerPadding ->
@@ -101,10 +105,36 @@ fun ManagementApp(
                 ShowRulesScreen()
             }
             composable(route = ManagementScreen.workAssign.name) {
-                addWorkScreen()
+                AddWorkScreen { title, id, description ->
+                    val newWork = WorkListData.Work(title, id, description)
+                    workList.add(newWork)
+                    navController.popBackStack()
+                }
             }
-            composable(route = ManagementScreen.workModify.name) {
-                modifyWorkScreen()
+            composable(route = ManagementScreen.displayWork.name) {
+                DisplayWorkListScreen(
+                    workList = workList,
+                    onNextButtonPress = {
+                        navController.navigate(ManagementScreen.workAssign.name)
+                    },
+                    onWorkSelected = { work ->
+                        selectedWork = work
+                        navController.navigate(ManagementScreen.detailedWork.name)
+                    },
+                    onDeleteWork = onDeleteWork
+                )
+            }
+            composable(route = ManagementScreen.detailedWork.name) {
+                selectedWork?.let { work ->
+                    WorkDetailScreen(
+                        workDetail = WorkDetail(
+                            title = work.title,
+                            id = work.id,
+                            description = work.description
+                        ),
+                        onEditClick = {} // Provide a dummy implementation
+                    )
+                }
             }
         }
     }
