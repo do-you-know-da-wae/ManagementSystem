@@ -34,7 +34,8 @@ enum class ManagementScreen(@StringRes val title: Int) {
     ruleSet(title = R.string.rules),
     displayWork(title = R.string.displayWorkList),
     workAssign(title = R.string.workAssign),
-    detailedWork(title = R.string.workDetail)
+    detailedWork(title = R.string.workDetail),
+    modifyWork(title = R.string.modifyWork)
 }
 
 @Composable
@@ -132,8 +133,30 @@ fun ManagementApp(
                             id = work.id,
                             description = work.description
                         ),
-                        onEditClick = {} // Provide a dummy implementation
+                        onEditClick = {
+                            navController.navigate(ManagementScreen.modifyWork.name)
+                        },
+                        onWorkDetailsChange = {}
                     )
+                }
+            }
+            composable(route = ManagementScreen.modifyWork.name) {
+                selectedWork?.let {work ->
+                    ModifyWorkScreen(
+                        initialTitleField = work.title,
+                        initialDescriptionField = work.description
+                    ) { updatedTitle, updatedDescription ->
+                        val updatedWork = WorkListData.Work(
+                            title = updatedTitle,
+                            id = work.id,
+                            description = updatedDescription
+                        )
+                        val index = workList.indexOfFirst { it.id == work.id }
+                        if (index != -1) {
+                            workList[index] = updatedWork
+                        }
+                        navController.popBackStack()
+                    }
                 }
             }
         }

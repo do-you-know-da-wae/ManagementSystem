@@ -17,6 +17,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,84 +32,98 @@ data class WorkDetail(val title: String, val id: String, val description: String
 fun WorkDetailScreen(
     workDetail: WorkDetail,
     onEditClick: () -> Unit, // Callback for handling edit button click
+    onWorkDetailsChange: (WorkDetail) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier
-        .padding(vertical = 8.dp, horizontal = 8.dp)
-        .fillMaxSize()
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Name:",
-                    modifier = Modifier.padding(end = 8.dp),
-                    fontSize = 18.sp // Increase font size
-                )
-                Card(
-                    modifier = Modifier.fillMaxWidth(), // Make the card fill the width
+    var isEditMode by remember { mutableStateOf(false) }
 
-                ) {
-                    Text(
-                        text = "${workDetail.title}",
-                        modifier = Modifier.padding(8.dp),
-                        fontSize = 18.sp // Increase font size
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "ID:",
-                    modifier = Modifier.padding(end = 8.dp),
-                    fontSize = 18.sp // Increase font size
-                )
-                Spacer(modifier = Modifier.width(30.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(), // Make the card fill the width
-
-                ) {
-                    Text(
-                        text = "${workDetail.id}",
-                        modifier = Modifier.padding(8.dp),
-                        fontSize = 18.sp // Increase font size
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Email: ",
-                    modifier = Modifier.padding(end = 8.dp),
-                    fontSize = 18.sp // Increase font size
-                )
-                Card(
-                    modifier = Modifier.fillMaxWidth(), // Make the card fill the width
-
-                ) {
-                    Text(
-                        text = "${workDetail.description}",
-                        modifier = Modifier.padding(8.dp),
-                        fontSize = 18.sp // Increase font size
-                    )
-                }
-            }
+    if (isEditMode) {
+        ModifyWorkScreen(
+            initialTitleField = workDetail.title,
+            initialDescriptionField = workDetail.description
+        ) { updatedTitle, updatedDescription ->
+            val updatedDetails = workDetail.copy(title = updatedTitle, description = updatedDescription)
+            onWorkDetailsChange(updatedDetails)
+            isEditMode = false
         }
-
-        FloatingActionButton(
-            onClick = onEditClick,
-            shape = CircleShape,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
+    } else {
+        Box(modifier = modifier
+            .padding(vertical = 8.dp, horizontal = 8.dp)
+            .fillMaxSize()
         ) {
-            Icon(
-                imageVector = Icons.Filled.Edit, // Use the Edit icon
-                contentDescription = "Edit"
-            )
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Name:",
+                        modifier = Modifier.padding(end = 8.dp),
+                        fontSize = 18.sp // Increase font size
+                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(), // Make the card fill the width
+
+                    ) {
+                        Text(
+                            text = "${workDetail.title}",
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 18.sp // Increase font size
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "ID:",
+                        modifier = Modifier.padding(end = 8.dp),
+                        fontSize = 18.sp // Increase font size
+                    )
+                    Spacer(modifier = Modifier.width(30.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(), // Make the card fill the width
+
+                    ) {
+                        Text(
+                            text = "${workDetail.id}",
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 18.sp // Increase font size
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Email: ",
+                        modifier = Modifier.padding(end = 8.dp),
+                        fontSize = 18.sp // Increase font size
+                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(), // Make the card fill the width
+
+                    ) {
+                        Text(
+                            text = "${workDetail.description}",
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 18.sp // Increase font size
+                        )
+                    }
+                }
+            }
+
+            FloatingActionButton(
+                onClick = onEditClick,
+                shape = CircleShape,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit, // Use the Edit icon
+                    contentDescription = "Edit"
+                )
+            }
         }
     }
 }

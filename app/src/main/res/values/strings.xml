@@ -8,4 +8,5 @@
     <string name="whatTimeStart">"Start Time: "</string>
     <string name="whatStartMinute">"Change Start minute to "</string>
     <string name="workDetail">Display detail work</string>
+    <string name="modifyWork">Modify Work Detail</string>
 </resources>
