@@ -38,12 +38,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.managementsystem.Data.WorkListData
-import com.example.managementsystem.Data.WorkListData.Work
+import com.example.managementsystem.Data.Work
 
 @Composable
 fun DisplayWorkListScreen(
-    workList: List<Work>,
+    state: WorkState,
     onNextButtonPress: () -> Unit,
     onWorkSelected: (Work) -> Unit,
     onDeleteWork: (Work) -> Unit,
@@ -59,7 +58,7 @@ fun DisplayWorkListScreen(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 48.dp)
         ) {
-            items(workList) { work ->
+            items(state.workList) { work ->
                 WorkListItem(
                     work = work,
                     onWorkSelected = onWorkSelected,
@@ -94,7 +93,7 @@ fun DisplayWorkListScreen(
                 AlertDialog(
                     onDismissRequest = { workToDelete = null },
                     title = { Text(text = "Confirm Deletion") },
-                    text = { Text(text = "Are you sure you want to delete ${workToDelete?.title}?") },
+                    text = { Text(text = "Are you sure you want to delete ${workToDelete?.workTitle}?") },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -142,8 +141,8 @@ fun WorkListItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = work.id)
-                    Text(text = work.title) // Convert id to string for display
+                    Text(text = work.workID)
+                    Text(text = work.workTitle) // Convert id to string for display
                 }
                 IconButton(
                     onClick = onDeleteWork,
@@ -165,10 +164,9 @@ fun WorkListItem(
 )
 @Composable
 fun DisplayWorkListPreview() {
-    val work = WorkListData.workList.toList()
 
     DisplayWorkListScreen(
-        workList = work,
+        state = WorkState(),
         onNextButtonPress = { /*TODO*/ },
         onWorkSelected = {},
         onDeleteWork = {}

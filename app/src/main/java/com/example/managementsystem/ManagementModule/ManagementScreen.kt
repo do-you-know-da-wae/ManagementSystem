@@ -13,7 +13,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,7 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.managementsystem.Data.WorkListData
+import com.example.managementsystem.Data.Work
 import com.example.managementsystem.R
 import com.example.managementsystem.ui.theme.ManagementSystemTheme
 
@@ -39,7 +38,7 @@ enum class ManagementScreen(@StringRes val title: Int) {
 }
 
 @Composable
-fun naviagtionBar(
+fun NavigationBar(
     goSetRulesButtonClicked: () -> Unit = {},
     goShowWorkButtonClicked: () -> Unit = {},
     currentScreen: ManagementScreen,
@@ -69,7 +68,9 @@ fun naviagtionBar(
 
 @Composable
 fun ManagementApp(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    state: WorkState,
+    onEvent: (WorkEvent) -> Unit
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
@@ -77,16 +78,15 @@ fun ManagementApp(
         backStackEntry?.destination?.route ?: ManagementScreen.managementMain.name
     )
 
-    val workList = remember { mutableStateListOf(*WorkListData.workList.toTypedArray()) }
-    var selectedWork by remember { mutableStateOf<WorkListData.Work?>(null) }
+    var selectedWork by remember { mutableStateOf<Work?>(null) }
 
-    val onDeleteWork: (WorkListData.Work) -> Unit = { work ->
-        workList.remove(work)
+    val onDeleteWork: (Work) -> Unit = { work ->
+        onEvent(WorkEvent.DeleteWork(work))
     }
 
     Scaffold(
         bottomBar = {
-            naviagtionBar(
+            NavigationBar(
                 currentScreen = currentScreen,
                 navigateUp = { navController.navigateUp() },
                 goSetRulesButtonClicked = {navController.navigate(ManagementScreen.ruleSet.name)},
@@ -106,15 +106,13 @@ fun ManagementApp(
                 ShowRulesScreen()
             }
             composable(route = ManagementScreen.workAssign.name) {
-                AddWorkScreen { title, id, description ->
-                    val newWork = WorkListData.Work(title, id, description)
-                    workList.add(newWork)
+                AddWorkScreen(state = state, onEvent = onEvent) {
                     navController.popBackStack()
                 }
             }
             composable(route = ManagementScreen.displayWork.name) {
                 DisplayWorkListScreen(
-                    workList = workList,
+                    state = state,
                     onNextButtonPress = {
                         navController.navigate(ManagementScreen.workAssign.name)
                     },
@@ -129,9 +127,9 @@ fun ManagementApp(
                 selectedWork?.let { work ->
                     WorkDetailScreen(
                         workDetail = WorkDetail(
-                            title = work.title,
-                            id = work.id,
-                            description = work.description
+                            title = work.workTitle,
+                            id = work.workID,
+                            description = work.workDescription
                         ),
                         onEditClick = {
                             navController.navigate(ManagementScreen.modifyWork.name)
@@ -143,32 +141,27 @@ fun ManagementApp(
             composable(route = ManagementScreen.modifyWork.name) {
                 selectedWork?.let {work ->
                     ModifyWorkScreen(
-                        initialTitleField = work.title,
-                        initialDescriptionField = work.description
+                        initialTitleField = work.workTitle,
+                        initialDescriptionField = work.workDescription
                     ) { updatedTitle, updatedDescription ->
-                        val updatedWork = WorkListData.Work(
-                            title = updatedTitle,
+                        val updatedWork = Work(
+                            workTitle = updatedTitle,
                             id = work.id,
-                            description = updatedDescription
+                            workID = work.workID,
+                            workDescription = updatedDescription
                         )
-                        val index = workList.indexOfFirst { it.id == work.id }
-                        if (index != -1) {
-                            workList[index] = updatedWork
-                        }
                         navController.popBackStack()
                     }
                 }
             }
         }
     }
-
-
 }
 
 @Preview
 @Composable
 fun managementSystemPreview(){
     ManagementSystemTheme{
-        ManagementApp()
+        ManagementApp(state = WorkState()) {}
     }
 }

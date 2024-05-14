@@ -61,7 +61,7 @@ class WorkViewModel(
                 _state.update { it.copy(
                     isAddingWork = false,
                     workTitle = "",
-                    workDescription = ""
+                    workDescription = "",
                 ) }
             }
 

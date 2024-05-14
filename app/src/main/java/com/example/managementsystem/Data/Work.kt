@@ -8,5 +8,6 @@ data class Work(
     val workTitle: String,
     val workDescription: String,
     @PrimaryKey(autoGenerate = true)
-    val workID: Int = 0
+    val id: Int = 0,
+    val workID: String = "W$id"
 )
